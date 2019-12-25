@@ -1,0 +1,129 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-2">Student_id</label>
+                <input type="text" id="Student_id" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Course_id</label>
+                <input type="text" id="Course_id" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">DecidedFee</label>
+                <input type="text" id="DecidedFee" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">StartDate</label>
+                <input type="date" id="StartDate" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">Duration</label>
+                <input type="text" id="Duration" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Student_id</th>
+        <th>Course_id</th>
+        <th>DecidedFee</th>
+        <th>StartDate</th>
+        <th>Duration</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    var formData;
+    function GetData() {
+        $('#body').empty();
+        $.ajax({
+            url: '/AcademicCourseStudent/GetData',
+            type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            success: function (result) {
+                var rows = '';
+                $.each(result, function (key, value) {
+                    rows = '<tr>'
+                         + '<td>' + value.ID + '</td>'
+                          + '<td>' + value.Student_id + '</td>'
+                        + '<td>' + value.Course_id + '</td>'
+                        + '<td>' + value.DecidedFee + '</td>'
+                        + '<td>' + value.StartDate + '</td>'
+                        + '<td>' + value.Duration + '</td>'
+                        + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                    '</tr>'
+                    $('#body').append(rows);
+                })
+            },
+            error: function (result) {
+            }
+        })
+    }
+    $(document).delegate('.edit', '.click', function () {
+        debugger
+        var rowValue = $(this).closest('tr');
+        var ID = rowValue.find("td:eq(0)").text();
+        var Student_id = rowValue.find("td:eq(1)").text();
+        var Course_id = rowValue.find("td:eq(2)").text();
+        var DecidedFee = rowValue.find("td:eq(3)").text();
+        var StartDate = rowValue.find("td:eq(4)").text();
+        var Duration = rowValue.find("td:eq(5)").text();
+
+        $('#ID').val(ID);
+        $('#Student_id').val(Student_id);
+        $('#Course_id').val(Course_id);
+        $('#DecidedFee').val(DecidedFee);
+        $('#StartDate').val(StartDate);
+        $('#Duration').val(Duration);
+    })
+    $('#btn_Add').click(function () {
+        Add(formData);
+    })
+    function Add() {
+        debugger
+        var data = {};
+        data.Student_id = $('#Student_id').val();
+        data.Course_id = $('#Course_id').val();
+        data.DecidedFee = $('#DecidedFee').val();
+        data.StartDate = $('#StartDate').val();
+        data.Duration = $('#Duration').val();
+        $.ajax({
+            url: "/AcademicCourseStudent/Insert",
+            data: JSON.stringify(data),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function () {
+                alert(" Success");
+                GetData();
+            },
+            error: function () {
+                alert("Failed");
+            }
+        })
+    }
+</script>
+

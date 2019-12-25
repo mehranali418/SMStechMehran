@@ -1,0 +1,155 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+                <label class="control-label col-lg-2">AssessmentCategoryID</label>
+                <input type="text" id="AssessmentCategoryID" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Name</label>
+                <input type="text" id="Name" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">Description</label>
+                <input type="text" id="Description" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">ParentID</label>
+                <input type="text" id="ParentID" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+
+                <label class="control-label col-lg-2">Sequence</label>
+                <input type="text" id="Sequence" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Is_Active</label>
+                <input type="text" id="Is_Active" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">Is_SummaryField</label>
+                <input type="text" id="Is_SummaryField" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Level</label>
+                <input type="text" id="Level" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>AssessmentCategoryID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>ParentID</th>
+        <th>Sequence</th>
+        <th>Is_Active</th>
+        <th>Is_SummaryField</th>
+        <th>Level</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script>
+    var formData;
+    $(document).ready(function () {
+        debugger
+        GetData();
+    })
+    function GetData() {
+        $('#body').empty();
+        $.ajax({
+            url: '/AssessmentAreas/GetData',
+            Type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            success: function (result) {
+                var rows = '';
+                $.each(result, function (key, value) {
+                    rows = '<tr>'
+                    + '<td>' + value.ID + '</td>'
+                    + '<td>' + value.AssessmentCategoryID + '</td>'
+                    + '<td>' + value.Name + '</td>'
+                    + '<td>' + value.Description + '</td>'
+                    + '<td>' + value.ParentID + '</td>'
+                    + '<td>' + value.Sequence + '</td>'
+                    + '<td>' + value.Is_Active + '</td>'
+                    + '<td>' + value.Is_SummaryField + '</td>'
+                    + '<td>' + value.Level + '</td>'
+                    + '<td><input type="button" class="btn btn-primary edit" value="Edit" > <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                    '</tr>'
+                    $('#body').append(rows);
+                })
+            },
+            error: function (result) {
+            }
+        })
+    }
+     $(document).delegate('.edit', '.click', function () {
+        debugger
+        var rowValue = $(this).closest('tr');
+        var ID = rowValue.find("td:eq(0)").text();
+        var AssessmentCategoryID = rowValue.find("td:eq(1)").text();
+        var Name = rowValue.find("td:eq(2)").text();
+        var Description = rowValue.find("td:eq(3)").text();
+        var ParentID = rowValue.find("td:eq(4)").text();
+        var Sequence = rowValue.find("td:eq(5)").text();
+        var Is_Active = rowValue.find("td:eq(6)").text();
+        var Is_SummaryField = rowValue.find("td:eq(7)").text();
+        var Level = rowValue.find("td:eq(8)").text();
+
+        $('#ID').val(ID);
+        $('#AssessmentCategoryID').val(AssessmentCategoryID);
+        $('#Name').val(Name);
+        $('#Description').val(Description);
+        $('#ParentID').val(ParentID);
+        $('#Sequence').val(Sequence);
+        $('#Is_Active').val(Is_Active);
+        $('#Is_SummaryField').val(Is_SummaryField);
+        $('#Level').val(Level);
+    })
+    $('#btn_Add').click(function () {
+        Add(formData);
+    })
+    function Add() {
+        debugger
+        var data = {};
+        data.AssessmentCategoryID = $('#AssessmentCategoryID').val();     
+        data.Name = $('#Name').val();
+        data.Description = $('#Description').val();
+        data.ParentID = $('#ParentID').val();
+        data.Sequence = $('#Sequence').val();
+        data.Is_Active = $('#Is_Active').val();
+        data.Is_SummaryField = $('#Is_SummaryField').val();
+        data.Level = $('#Level').val();
+        $.ajax({
+            url: "/AssessmentAreas/Insert",
+            data: JSON.stringify(data),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function () {
+                alert(" Success");
+                GetData();
+            },
+            error: function () {
+                alert("Failed");
+            }
+        })
+    }
+</script>

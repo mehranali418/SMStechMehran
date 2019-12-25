@@ -1,0 +1,120 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-2">ColorName</label>
+                <input type="text" id="ColorName" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">ColorCode</label>
+                <input type="text" id="ColorCode" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">ColorMeaning</label>
+                <input type="text" id="ColorMeaning" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Is_Active</label>
+                <input type="text" id="Is_Active" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>ColorName</th>
+        <th>ColorCode</th>
+        <th>ColorMeaning</th>
+        <th>Is_Active</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    var formData;
+    function GetData() {
+        $('#body').empty();
+        $.ajax({
+            url: '/AssessmentColors/GetData',
+            type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            success: function (result) {
+                var rows = '';
+                $.each(result, function (key, value) {
+                    rows = '<tr>'
+                         + '<td>' + value.ID + '</td>'
+                          + '<td>' + value.ColorName + '</td>'
+                        + '<td>' + value.ColorCode + '</td>'
+                        + '<td>' + value.ColorMeaning + '</td>'
+                        + '<td>' + value.Is_Active + '</td>'
+                        + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                    '</tr>'
+                    $('#body').append(rows);
+                })
+            },
+            error: function (result) {
+            }
+        })
+    }
+    $(document).delegate('.edit', '.click', function () {
+        debugger
+        var rowValue = $(this).closest('tr');
+        var ID = rowValue.find("td:eq(0)").text();
+        var ColorName = rowValue.find("td:eq(1)").text();
+        var ColorCode = rowValue.find("td:eq(2)").text();
+        var ColorMeaning = rowValue.find("td:eq(3)").text();
+        var Is_Active = rowValue.find("td:eq(4)").text();
+       
+        $('#ID').val(ID);
+        $('#ColorName').val(ColorName);
+        $('#ColorCode').val(ColorCode);
+        $('#ColorMeaning').val(ColorMeaning);
+        $('#Is_Active').val(Is_Active);
+       
+    })
+    $('#btn_Add').click(function () {
+        Add(formData);
+    })
+    function Add() {
+        debugger
+        var data = {};
+        data.ColorName = $('#ColorName').val();
+        data.ColorCode = $('#ColorCode').val();
+        data.ColorMeaning = $('#ColorMeaning').val();
+        data.Is_Active = $('#Is_Active').val();
+ 
+        $.ajax({
+            url: "/AssessmentColors/Insert",
+            data: JSON.stringify(data),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function () {
+                alert(" Success");
+                GetData();
+            },
+            error: function () {
+                alert("Failed");
+            }
+        })
+    }
+</script>
+

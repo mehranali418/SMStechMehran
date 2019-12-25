@@ -1,0 +1,129 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-2">UserID</label>
+                @Html.DropDownList("UserID", (IEnumerable<SelectListItem>)ViewBag.UserID, "Select UserID ", new { @class = "form-control col-lg-2" })
+                <label class="control-label col-lg-2">AllowanceTypeID</label>
+                <input type="text" id="AllowanceTypeID" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">Amount</label>
+                <input type="text" id="Amount" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">SalaryMonthID</label>
+                <input type="text" id="SalaryMonthID" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">AllowanceAmountID</label>
+                <input type="text" id="AllowanceAmountID" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+        </div>
+
+        <table class="table table-striped">
+            <tr>
+                <th>ID</th>
+                <th>UserID</th>
+                <th>AllowanceTypeID</th>
+                <th>Amount</th>
+                <th>SalaryMonthID</th>
+                <th>AllowanceAmountID</th>
+                <th>Actions</th>
+            </tr>
+            <tbody id="body"></tbody>
+        </table>
+
+        <script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+        <script>
+            var formData;
+            function GetData() {
+                $('#body').empty();
+                $.ajax({
+                    url: '/AllowanceAmounts/GetData',
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json;charset=utf-8',
+                    success: function (result) {
+                        var rows = '';
+                        $.each(result, function (key, value) {
+                            rows = '<tr>'
+                                 + '<td>' + value.ID + '</td>'
+                                  + '<td>' + value.UserID + '</td>'
+                                + '<td>' + value.AllowanceTypeID + '</td>'
+                                + '<td>' + value.Amount + '</td>'
+                                + '<td>' + value.SalaryMonthID + '</td>'
+                                + '<td>' + value.AllowanceAmountID + '</td>'                              
+                                + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                            '</tr>'
+                            $('#body').append(rows);
+                        })
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+            $(document).delegate('.edit', '.click', function () {
+                debugger
+                var rowValue = $(this).closest('tr');
+                var ID = rowValue.find("td:eq(0)").text();
+                var UserID = rowValue.find("td:eq(1)").text();
+                var AllowanceTypeID = rowValue.find("td:eq(2)").text();
+                var Amount = rowValue.find("td:eq(3)").text();
+                var SalaryMonthID = rowValue.find("td:eq(4)").text();
+                var AllowanceAmountID = rowValue.find("td:eq(5)").text();
+
+                $('#ID').val(ID);
+                $('#UserID').val(UserID);
+                $('#AllowanceTypeID').val(AllowanceTypeID);
+                $('#Amount').val(Amount);
+                $('#SalaryMonthID').val(SalaryMonthID);
+                $('#AllowanceAmountID').val(AllowanceAmountID);
+            })
+            $('#btn_Add').click(function () {
+                Add(formData);
+            })
+            function Add() {
+                debugger
+                var data = {};
+                data.UserID = $('#UserID').val();
+                data.AllowanceTypeID = $('#AllowanceTypeID').val();
+                data.Amount = $('#Amount').val();
+                data.SalaryMonthID = $('#SalaryMonthID').val();
+                data.AllowanceAmountID = $('#AllowanceAmountID').val();
+                $.ajax({
+                    url: "/AllowanceAmounts/Insert",
+                    data: JSON.stringify(data),
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        alert(" Success");
+                        GetData();
+                    },
+                    error: function () {
+                        alert("Failed");
+                    }
+                })
+            }
+        </script>
+

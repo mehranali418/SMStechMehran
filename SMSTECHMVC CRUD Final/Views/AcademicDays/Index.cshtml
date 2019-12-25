@@ -1,0 +1,114 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-2">Name</label>
+                <input type="text" id="Name" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Holyday</label>
+                <input type="text" id="Holyday" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">DayNumber</label>
+                <input type="text" id="DayNumber" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <div class="row">
+                <br />
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Holyday</th>
+        <th>DayNumber</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    var formData;
+    function GetData() {
+        $('#body').empty();
+        $.ajax({
+            url: '/AcademicDays/GetData',
+            type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            success: function (result) {
+                var rows = '';
+                $.each(result, function (key, value) {
+                    rows = '<tr>'
+                         + '<td>' + value.ID + '</td>'
+                          + '<td>' + value.Name + '</td>'
+                        + '<td>' + value.Holyday + '</td>'
+                        + '<td>' + value.DayNumber + '</td>'                      
+                        + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                    '</tr>'
+                    $('#body').append(rows);
+                })
+            },
+            error: function (result) {
+            }
+        })
+    }
+    $(document).delegate('.edit', '.click', function () {
+        debugger
+        var rowValue = $(this).closest('tr');
+        var ID = rowValue.find("td:eq(0)").text();
+        var Name = rowValue.find("td:eq(1)").text();
+        var Holyday = rowValue.find("td:eq(2)").text();
+        var DayNumber = rowValue.find("td:eq(3)").text();
+  
+        $('#ID').val(ID);
+        $('#Name').val(Name);
+        $('#Holyday').val(Holyday);
+        $('#DayNumber').val(DayNumber);
+    })
+        $('#btn_Add').click(function () {
+            Add(formData);
+        })
+        function Add() {
+            debugger
+            var data = {};
+            data.Name = $('#Name').val();
+            data.Holyday = $('#Holyday').val();
+            data.DayNumber = $('#DayNumber').val();          
+            $.ajax({
+                url: "/AcademicDays/Insert",
+                data: JSON.stringify(data),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function () {
+                    alert(" Success");
+                    GetData();
+                },
+                error: function () {
+                    alert("Failed");
+                }
+            })
+        }
+</script>
+
+

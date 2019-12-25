@@ -1,0 +1,113 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-3">AssessmentFindingMasterID</label>
+                <input type="text" id="AssessmentFindingMasterID" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">AssessmentAreaID</label>
+                <input type="text" id="AssessmentAreaID" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-3">Finding</label>
+                <input type="text" id="Finding" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>AssessmentFindingMasterID</th>
+        <th>AssessmentAreaID</th>
+        <th>Finding</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    var formData;
+    function GetData() {
+        $('#body').empty();
+        $.ajax({
+            url: '/AssessmentFindingDetail/GetData',
+            type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            success: function (result) {
+                var rows = '';
+                $.each(result, function (key, value) {
+                    rows = '<tr>'
+                         + '<td>' + value.ID + '</td>'
+                          + '<td>' + value.AssessmentFindingMasterID + '</td>'
+                        + '<td>' + value.AssessmentAreaID + '</td>'
+                        + '<td>' + value.Finding + '</td>'
+                        + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                    '</tr>'
+                    $('#body').append(rows);
+                })
+            },
+            error: function (result) {
+            }
+        })
+    }
+    $(document).delegate('.edit', '.click', function () {
+        debugger
+        var rowValue = $(this).closest('tr');
+        var ID = rowValue.find("td:eq(0)").text();
+        var AssessmentFindingMasterID = rowValue.find("td:eq(1)").text();
+        var AssessmentAreaID = rowValue.find("td:eq(2)").text();
+        var Finding = rowValue.find("td:eq(3)").text();
+
+        $('#ID').val(ID);
+        $('#AssessmentFindingMasterID').val(AssessmentFindingMasterID);
+        $('#AssessmentAreaID').val(AssessmentAreaID);
+        $('#Finding').val(Finding);
+
+    })
+    $('#btn_Add').click(function () {
+        Add(formData);
+    })
+    function Add() {
+        debugger
+        var data = {};
+        data.AssessmentFindingMasterID = $('#AssessmentFindingMasterID').val();
+        data.AssessmentAreaID = $('#AssessmentAreaID').val();
+        data.Finding = $('#Finding').val();
+
+        $.ajax({
+            url: "/AssessmentFindingDetail/Insert",
+            data: JSON.stringify(data),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function () {
+                alert(" Success");
+                GetData();
+            },
+            error: function () {
+                alert("Failed");
+            }
+        })
+    }
+</script>
+

@@ -1,0 +1,118 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-2">Name</label>
+                <input type="text" id="Name" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">Recurring</label>
+                <input type="text" id="Recurring" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">AllowanceType1</label>
+                <input type="text" id="AllowanceType1" class="form-control col-lg-2" />             
+                <label class="control-label col-lg-2">SequenceNumber</label>
+                <input type="text" id="SequenceNumber" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Recurring</th>
+        <th>AllowanceType</th>
+        <th>SequenceNumber</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+            var formData;
+            function GetData() {
+                $('#body').empty();
+                $.ajax({
+                    url: '/AllowanceTypes/GetData',
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json;charset=utf-8',
+                    success: function (result) {
+                        var rows = '';
+                        $.each(result, function (key, value) {
+                            rows = '<tr>'
+                                 + '<td>' + value.ID + '</td>'
+                                  + '<td>' + value.Name + '</td>'
+                                + '<td>' + value.Recurring + '</td>'
+                                + '<td>' + value.AllowanceType1 + '</td>'
+                                + '<td>' + value.SequenceNumber + '</td>'
+                                + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                            '</tr>'
+                            $('#body').append(rows);
+                        })
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+            $(document).delegate('.edit', '.click', function () {
+                debugger
+                var rowValue = $(this).closest('tr');
+                var ID = rowValue.find("td:eq(0)").text();
+                var Name = rowValue.find("td:eq(1)").text();
+                var Recurring = rowValue.find("td:eq(2)").text();
+                var AllowanceType1 = rowValue.find("td:eq(3)").text();
+                var SequenceNumber = rowValue.find("td:eq(4)").text();
+
+                $('#ID').val(ID);
+                $('#Name').val(Name);
+                $('#Recurring').val(Recurring);
+                $('#AllowanceType1').val(AllowanceType1);
+                $('#SequenceNumber').val(SequenceNumber);
+            })
+            $('#btn_Add').click(function () {
+                Add(formData);
+            })
+            function Add() {
+                debugger
+                var data = {};
+                data.Name = $('#Name').val();
+                data.Recurring = $('#Recurring').val();
+                data.AllowanceType1 = $('#AllowanceType1').val();
+                data.SequenceNumber = $('#SequenceNumber').val();
+                $.ajax({
+                    url: "/AllowanceTypes/Insert",
+                    data: JSON.stringify(data),
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        alert(" Success");
+                        GetData();
+                    },
+                    error: function () {
+                        alert("Failed");
+                    }
+                })
+            }
+</script>
+

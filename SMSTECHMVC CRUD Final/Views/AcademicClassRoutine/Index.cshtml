@@ -1,0 +1,136 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<br />
+<div class="container">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <input type="text" id="ID" style="display:none" />
+
+                <label class="control-label col-lg-2">SubjectID</label>
+                <input type="text" id="SubjectID" class="form-control col-lg-2" />
+                <label class="control-label col-lg-2">UserID</label>
+                @Html.DropDownList("UserID", (IEnumerable<SelectListItem>)ViewBag.UserID, "Select UserID ", new { @class = "form-control col-lg-2" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">SectionID</label>
+                @Html.DropDownList("SectionID", (IEnumerable<SelectListItem>)ViewBag.SectionID, "Select SectionID ", new { @class = "form-control col-lg-2" })
+                <label class="control-label col-lg-2">PeriodID</label>
+                <input type="text" id="PeriodID" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-lg-2">Status</label>
+                <input type="text" id="Status" class="form-control col-lg-2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <input type="button" value="Add" id="btn_Add" class="btn btn-primary" />
+                <input type="button" value="Update" id="btn_Update" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+</div>
+   
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>SubjectID</th>
+        <th>UserID</th>
+        <th>SectionID</th>
+        <th>PeriodID</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    <tbody id="body"></tbody>
+</table>
+
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    var formData;
+    function GetData() {
+        $('#body').empty();
+        $.ajax({
+            url: '/AcademicClassRoutine/GetData',
+            type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            success: function (result) {
+                var rows = '';
+                $.each(result, function (key, value) {
+                    rows = '<tr>'
+                         + '<td>' + value.ID + '</td>'
+                          + '<td>' + value.SubjectID + '</td>'
+                        + '<td>' + value.SectionID + '</td>'
+                        + '<td>' + value.UserID + '</td>'
+                        + '<td>' + value.PeriodID + '</td>'
+                        + '<td>' + value.Status + '</td>'
+                        + '<td><input type="button" class="btn btn-primary edit" value="Edit"> <input type="button" class="btn btn-danger delete" value="Delete"></td>'
+                    '</tr>'
+                    $('#body').append(rows);
+                })
+            },
+            error: function (result) {
+            }
+        })
+    }
+    $(document).delegate('.edit', '.click', function () {
+        debugger
+        var rowValue = $(this).closest('tr');
+        var ID = rowValue.find("td:eq(0)").text();
+        var SubjectID = rowValue.find("td:eq(1)").text();
+        var SectionID = rowValue.find("td:eq(2)").text();
+        var UserID = rowValue.find("td:eq(3)").text();
+        var PeriodID = rowValue.find("td:eq(4)").text();
+        var Status = rowValue.find("td:eq(5)").text();
+
+        $('#ID').val(ID);
+        $('#SubjectID').val(SubjectID);
+        $('#SectionID').val(SectionID);
+        $('#UserID').val(UserID);
+        $('#PeriodID').val(PeriodID);
+        $('#Status').val(Status);
+    })
+    $('#btn_Add').click(function () {
+        Add(formData);
+    })
+    function Add() {
+        debugger
+        var data = {};
+        data.SubjectID = $('#SubjectID').val();
+        data.SectionID = $('#SectionID').val();
+        data.UserID = $('#UserID').val();
+        data.PeriodID = $('#PeriodID').val();
+        data.Status = $('#Status').val();
+        $.ajax({
+            url: "/AcademicClassRoutine/Insert",
+            data: JSON.stringify(data),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function () {
+                alert(" Success");
+                GetData();
+            },
+            error: function () {
+                alert("Failed");
+            }
+        })
+    }
+</script>
